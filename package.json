@@ -1,0 +1,18 @@
+{
+  "name": "tracedesk",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@tracedesk/web",
+    "dev:web": "npm run dev --workspace=@tracedesk/web",
+    "eval": "cd services/api && .\\.venv\\Scripts\\python.exe -m tracedesk_api.evaluation",
+    "lint": "npm run lint --workspace=@tracedesk/web",
+    "typecheck": "npm run typecheck --workspace=@tracedesk/web"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

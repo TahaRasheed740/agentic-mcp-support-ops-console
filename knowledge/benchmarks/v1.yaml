@@ -1,0 +1,123 @@
+version: "1.0"
+cases:
+  - ticket_id: TKT-1001
+    expected_category: authentication
+    acceptable_root_causes: [destination still validates the previous webhook signing secret]
+    required_sources: [webhook-authentication]
+    prohibited_claims: [Acme automatically keeps both webhook secrets active]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [update destination secret, send one test delivery]
+    escalation_required: false
+  - ticket_id: TKT-1002
+    expected_category: scheduling
+    acceptable_root_causes: [local schedule was compared against the wrong UTC date or hour]
+    required_sources: [scheduled-runs-timezones]
+    prohibited_claims: [all schedules execute at a fixed UTC hour]
+    allowed_tools: [search_knowledge, get_organization, list_job_runs]
+    expected_actions: [confirm workspace time zone, inspect next-run preview]
+    escalation_required: false
+  - ticket_id: TKT-1003
+    expected_category: authentication
+    acceptable_root_causes: [provider revoked or rejected the OAuth refresh token]
+    required_sources: [oauth-token-lifecycle]
+    prohibited_claims: [retries can repair an invalid_grant response]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [reauthorize the intended provider account]
+    escalation_required: false
+  - ticket_id: TKT-1004
+    expected_category: billing
+    acceptable_root_causes: [failed and manually retried production runs were omitted from customer counting]
+    required_sources: [usage-quotas]
+    prohibited_claims: [only successful runs count toward quota]
+    allowed_tools: [search_knowledge, get_organization, list_job_runs]
+    expected_actions: [reconcile all started production runs in the billing period]
+    escalation_required: false
+  - ticket_id: TKT-1005
+    expected_category: data_mapping
+    acceptable_root_causes: [source field moved into a nested object after a schema change]
+    required_sources: [mapping-schema-changes]
+    prohibited_claims: [Acme silently rewrites mapping paths]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [preview and publish an updated mapping path]
+    escalation_required: false
+  - ticket_id: TKT-1006
+    expected_category: configuration
+    acceptable_root_causes: [system auto-pause after consecutive permanent failures]
+    required_sources: [automatic-pauses]
+    prohibited_claims: [a human operator necessarily paused the integration]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [resolve permanent error, acknowledge and resume]
+    escalation_required: false
+  - ticket_id: TKT-1007
+    expected_category: reliability
+    acceptable_root_causes: [regional worker or queue degradation in EU]
+    required_sources: [regional-delivery-latency, eu-latency-incident-review]
+    prohibited_claims: [the customer endpoint caused the regional queue delay]
+    allowed_tools: [search_knowledge, get_organization, list_job_runs, list_incidents]
+    expected_actions: [correlate queue latency with EU incident, avoid endpoint changes]
+    escalation_required: true
+  - ticket_id: TKT-1008
+    expected_category: rate_limits
+    acceptable_root_causes: [destination is accepting fewer requests than current concurrency emits]
+    required_sources: [destination-rate-limits]
+    prohibited_claims: [manual retries should run alongside scheduled retries]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [honor Retry-After, reduce concurrency or batch size]
+    escalation_required: false
+  - ticket_id: TKT-1009
+    expected_category: data_integrity
+    acceptable_root_causes: [manual replay created a new delivery without destination event-id deduplication]
+    required_sources: [retry-idempotency]
+    prohibited_claims: [every replay preserves the original delivery ID]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [stop replays, deduplicate by source event ID]
+    escalation_required: true
+  - ticket_id: TKT-1010
+    expected_category: retention
+    acceptable_root_causes: [current plan provides seven-day retention]
+    required_sources: [log-retention]
+    prohibited_claims: [all organizations receive thirty-day retention]
+    allowed_tools: [search_knowledge, get_organization]
+    expected_actions: [confirm plan boundary, configure export if needed]
+    escalation_required: false
+  - ticket_id: TKT-1011
+    expected_category: authentication
+    acceptable_root_causes: [failing endpoint changes raw body bytes or uses the wrong endpoint secret]
+    required_sources: [webhook-signatures]
+    prohibited_claims: [signatures are calculated over parsed JSON]
+    allowed_tools: [search_knowledge, get_integration, list_job_runs]
+    expected_actions: [verify exact raw bytes with endpoint-specific secret]
+    escalation_required: false
+  - ticket_id: TKT-1012
+    expected_category: configuration
+    acceptable_root_causes: [sandbox route references a production destination object]
+    required_sources: [environment-routing]
+    prohibited_claims: [integration environment automatically enforces destination isolation]
+    allowed_tools: [search_knowledge, get_integration]
+    expected_actions: [replace route destination with sandbox-only endpoint]
+    escalation_required: true
+  - ticket_id: TKT-1013
+    expected_category: scheduling
+    acceptable_root_causes: [CSV exports intentionally use UTC regardless of workspace display zone]
+    required_sources: [export-timezones]
+    prohibited_claims: [changing workspace zone changes CSV timestamps]
+    allowed_tools: [search_knowledge, get_organization]
+    expected_actions: [convert ISO-8601 UTC downstream]
+    escalation_required: false
+  - ticket_id: TKT-1014
+    expected_category: reliability
+    acceptable_root_causes: [transient gateway or destination error]
+    required_sources: [transient-delivery-errors, support-troubleshooting-handbook]
+    prohibited_claims: [successful identical retries prove a payload defect]
+    allowed_tools: [search_knowledge, list_job_runs, list_incidents]
+    expected_actions: [allow automatic retries, correlate time and region]
+    escalation_required: false
+  - ticket_id: TKT-1015
+    expected_category: plan_access
+    acceptable_root_causes: [SSO requires Enterprise plan and organization owner role]
+    required_sources: [sso-entitlements]
+    prohibited_claims: [workspace administrators on Scale can enable SSO]
+    allowed_tools: [search_knowledge, get_organization]
+    expected_actions: [involve owner and confirm Enterprise entitlement]
+    escalation_required: false
+

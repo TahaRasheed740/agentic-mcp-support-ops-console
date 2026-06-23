@@ -1,0 +1,315 @@
+{
+  "dataset_version": "1.0",
+  "generated_at": "2026-06-22T07:04:15.285613+00:00",
+  "mode": "hybrid",
+  "limit": 8,
+  "cases": 15,
+  "case_success_rate": 1.0,
+  "required_source_recall": 1.0,
+  "results": [
+    {
+      "ticket_id": "TKT-1001",
+      "required_sources": [
+        "webhook-authentication"
+      ],
+      "found_sources": [
+        "webhook-authentication"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "webhook-authentication",
+        "eu-latency-incident-review",
+        "api-key-rotation",
+        "transient-delivery-errors",
+        "destination-rate-limits",
+        "retry-policy",
+        "webhook-signatures",
+        "usage-quotas"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1002",
+      "required_sources": [
+        "scheduled-runs-timezones"
+      ],
+      "found_sources": [
+        "scheduled-runs-timezones"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "export-timezones",
+        "scheduled-runs-timezones",
+        "schedule-troubleshooting",
+        "eu-latency-incident-review",
+        "log-export",
+        "log-retention",
+        "usage-metering",
+        "csv-export-guide"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1003",
+      "required_sources": [
+        "oauth-token-lifecycle"
+      ],
+      "found_sources": [
+        "oauth-token-lifecycle"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "oauth-token-lifecycle",
+        "integration-health-states",
+        "destination-rate-limits",
+        "job-run-statuses",
+        "transient-delivery-errors",
+        "api-key-rotation",
+        "regional-delivery-latency",
+        "retry-policy"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1004",
+      "required_sources": [
+        "usage-quotas"
+      ],
+      "found_sources": [
+        "usage-quotas"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "usage-quotas",
+        "scheduled-runs-timezones",
+        "destination-rate-limits",
+        "schedule-troubleshooting",
+        "usage-metering",
+        "log-retention",
+        "retry-policy",
+        "export-timezones"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1005",
+      "required_sources": [
+        "mapping-schema-changes"
+      ],
+      "found_sources": [
+        "mapping-schema-changes"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "mapping-schema-changes",
+        "csv-export-guide",
+        "webhook-authentication",
+        "mapping-test-mode",
+        "environment-isolation",
+        "usage-metering",
+        "log-export",
+        "transient-delivery-errors"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1006",
+      "required_sources": [
+        "automatic-pauses"
+      ],
+      "found_sources": [
+        "automatic-pauses"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "automatic-pauses",
+        "integration-health-states",
+        "schedule-troubleshooting",
+        "pause-audit-events",
+        "environment-routing",
+        "log-export",
+        "usage-quotas",
+        "usage-metering"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1007",
+      "required_sources": [
+        "regional-delivery-latency",
+        "eu-latency-incident-review"
+      ],
+      "found_sources": [
+        "regional-delivery-latency",
+        "eu-latency-incident-review"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "eu-latency-incident-review",
+        "regional-delivery-latency",
+        "usage-metering",
+        "regional-routing",
+        "deduplication-keys",
+        "schedule-troubleshooting",
+        "webhook-delivery-lifecycle",
+        "transient-delivery-errors"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1008",
+      "required_sources": [
+        "destination-rate-limits"
+      ],
+      "found_sources": [
+        "destination-rate-limits"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "destination-rate-limits",
+        "retry-policy",
+        "transient-delivery-errors",
+        "usage-quotas",
+        "eu-latency-incident-review",
+        "webhook-delivery-lifecycle",
+        "regional-delivery-latency",
+        "usage-metering"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1009",
+      "required_sources": [
+        "retry-idempotency"
+      ],
+      "found_sources": [
+        "retry-idempotency"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "retry-idempotency",
+        "usage-quotas",
+        "deduplication-keys",
+        "destination-rate-limits",
+        "support-troubleshooting-handbook",
+        "retry-policy",
+        "environment-isolation",
+        "api-key-rotation"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1010",
+      "required_sources": [
+        "log-retention"
+      ],
+      "found_sources": [
+        "log-retention"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "log-retention",
+        "usage-metering",
+        "schedule-troubleshooting",
+        "scheduled-runs-timezones",
+        "log-export",
+        "usage-quotas",
+        "export-timezones",
+        "webhook-delivery-lifecycle"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1011",
+      "required_sources": [
+        "webhook-signatures"
+      ],
+      "found_sources": [
+        "webhook-signatures"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "webhook-signatures",
+        "signature-debugging",
+        "webhook-authentication",
+        "oauth-token-lifecycle",
+        "deduplication-keys",
+        "api-key-rotation",
+        "regional-delivery-latency",
+        "transient-delivery-errors"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1012",
+      "required_sources": [
+        "environment-routing"
+      ],
+      "found_sources": [
+        "environment-routing"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "environment-routing",
+        "environment-isolation",
+        "mapping-test-mode",
+        "mapping-schema-changes",
+        "job-run-statuses",
+        "transient-delivery-errors",
+        "usage-quotas",
+        "usage-metering"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1013",
+      "required_sources": [
+        "export-timezones"
+      ],
+      "found_sources": [
+        "export-timezones"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "export-timezones",
+        "scheduled-runs-timezones",
+        "csv-export-guide",
+        "log-export",
+        "schedule-troubleshooting",
+        "environment-routing",
+        "mapping-schema-changes",
+        "usage-metering"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1014",
+      "required_sources": [
+        "transient-delivery-errors",
+        "support-troubleshooting-handbook"
+      ],
+      "found_sources": [
+        "transient-delivery-errors",
+        "support-troubleshooting-handbook"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "eu-latency-incident-review",
+        "transient-delivery-errors",
+        "retry-policy",
+        "regional-delivery-latency",
+        "support-troubleshooting-handbook",
+        "usage-quotas",
+        "destination-rate-limits",
+        "deduplication-keys"
+      ]
+    },
+    {
+      "ticket_id": "TKT-1015",
+      "required_sources": [
+        "sso-entitlements"
+      ],
+      "found_sources": [
+        "sso-entitlements"
+      ],
+      "all_required_found": true,
+      "retrieved_sources": [
+        "sso-entitlements",
+        "integration-health-states",
+        "scheduled-runs-timezones",
+        "export-timezones",
+        "log-retention",
+        "oauth-reconnect-guide",
+        "mapping-test-mode",
+        "api-key-rotation"
+      ]
+    }
+  ]
+}

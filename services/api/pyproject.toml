@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracedesk-api"
+version = "0.1.0"
+description = "TraceDesk application API"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic==1.18.4",
+  "anthropic>=0.75,<2",
+  "asyncpg==0.31.0",
+  "fastapi==0.138.0",
+  "fastembed>=0.7,<1",
+  "mcp>=1.26,<2",
+  "pgvector>=0.4,<1",
+  "pypdf>=6,<7",
+  "pydantic-settings==2.14.2",
+  "pyyaml>=6,<7",
+  "rank-bm25==0.2.2",
+  "sqlalchemy[asyncio]==2.0.51",
+  "uvicorn[standard]==0.49.0",
+]
+
+[dependency-groups]
+dev = [
+  "httpx==0.28.1",
+  "mypy==1.20.2",
+  "pytest==8.4.2",
+  "pytest-asyncio==0.26.0",
+  "reportlab>=4,<5",
+  "ruff==0.15.18",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+ignore = ["B008", "E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["tracedesk_api"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["asyncpg.*", "pgvector.*", "rank_bm25", "yaml"]
+ignore_missing_imports = true

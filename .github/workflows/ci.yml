@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --project services/api --group dev --locked
+      - run: uv run --project services/api ruff check services/api scripts
+      - run: uv run --project services/api mypy --config-file services/api/pyproject.toml services/api/src
+      - run: uv run --project services/api pytest services/api/tests
+      - run: uv run --project services/api python -m tracedesk_api.evaluation
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e --workspace apps/web
+
+  containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config --quiet
+      - run: docker compose build
+      - run: docker compose up -d --wait
+      - run: docker compose exec -T api python -m tracedesk_api.mcp_layer.contract_eval
+      - if: always()
+        run: docker compose down -v

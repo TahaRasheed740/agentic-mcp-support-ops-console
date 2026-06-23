@@ -1,0 +1,388 @@
+version: "1.0"
+documents:
+  - slug: webhook-authentication
+    title: Webhook authentication failures after secret rotation
+    area: authentication
+    version: "2.2"
+    status: current
+    summary: A 401 immediately after credential rotation usually means the destination still validates the previous shared secret.
+    signals: Repeated DESTINATION_401 results begin at the rotation timestamp while network delivery remains healthy.
+    cause: Acme activates a new signing secret immediately; destinations must update the matching secret and cannot retrieve its plaintext later.
+    procedure: Confirm the integration and endpoint, compare the first failed run with the audit event, update the destination secret, then replay one failed delivery.
+    verification: A new test delivery returns a 2xx response and its signature validates with the new secret.
+  - slug: scheduled-runs-timezones
+    title: Scheduled runs, time zones, and daylight saving time
+    area: scheduling
+    version: "3.1"
+    status: current
+    summary: Schedules use the workspace IANA time zone, not the browser time zone, and daylight saving changes can shift the corresponding UTC hour.
+    signals: A run appears missing when operators compare its local schedule with UTC or inspect the wrong calendar day.
+    cause: The scheduler stores the local wall-clock rule and calculates UTC execution independently for each date.
+    procedure: Confirm the workspace time zone, inspect the next-run preview, and compare the schedule with the job history in local time.
+    verification: The next-run preview and generated run agree on the same local date and time.
+  - slug: oauth-token-lifecycle
+    title: OAuth token lifecycle and expired connections
+    area: authentication
+    version: "2.0"
+    status: current
+    summary: A connection becomes expired when the provider revokes its refresh token or rejects refresh with invalid_grant.
+    signals: The connection is marked expired and new runs stop before payload delivery; repeated retries cannot repair provider authorization.
+    cause: Password changes, app-policy changes, provider inactivity rules, or explicit revocation invalidate the refresh token.
+    procedure: Inspect the provider error, verify the connected account, reauthorize once, and avoid retrying jobs until the connection reports connected.
+    verification: Token refresh succeeds and a test run reaches the provider using the expected account.
+  - slug: usage-quotas
+    title: Monthly run quotas and usage calculation
+    area: billing
+    version: "4.0"
+    status: current
+    summary: Quota usage counts every started production run, including failed and manually retried runs; sandbox runs do not count.
+    signals: Billing usage exceeds a customer-created success report because failed starts and retries were omitted from that report.
+    cause: Monthly allowance is metered at run start to provide consistent enforcement across destinations.
+    procedure: Compare the billing period, include failed and retried production runs, and confirm the organization plan rather than an integration label.
+    verification: The reconstructed production-run count matches the usage meter within the documented processing delay.
+  - slug: mapping-schema-changes
+    title: Diagnosing mappings after an upstream schema change
+    area: data_mapping
+    version: "2.4"
+    status: current
+    summary: Existing mappings return empty values when a field moves into a nested object unless the mapping path is updated.
+    signals: Historical payloads succeed while newer payloads show null mapped fields and a different schema fingerprint.
+    cause: Mapping paths are explicit and are not silently rewritten when the source schema changes.
+    procedure: Compare one successful and one affected payload in test mode, update the field path, preview the mapped output, and publish a new mapping version.
+    verification: The preview contains the expected value and a new production event completes without a mapping warning.
+  - slug: automatic-pauses
+    title: Why Acme automatically pauses an integration
+    area: configuration
+    version: "2.3"
+    status: current
+    summary: Acme automatically pauses an integration after twenty consecutive permanent failures to protect the destination and customer quota.
+    signals: The audit actor is system:auto-pause and the preceding runs share a permanent authentication or configuration error.
+    cause: Permanent failures cannot recover through backoff, so the circuit breaker stops new work until an operator intervenes.
+    procedure: Resolve the underlying permanent error, acknowledge the pause, resume the integration, and send one test event.
+    verification: The integration remains connected and the consecutive permanent-failure counter returns to zero.
+  - slug: regional-delivery-latency
+    title: Investigating region-specific delivery latency
+    area: reliability
+    version: "3.0"
+    status: current
+    summary: Latency isolated to one region with healthy destinations should be correlated with the regional incident timeline before changing customer configuration.
+    signals: Queue time rises while execution time stays normal, multiple organizations are affected, and another region remains healthy.
+    cause: A regional worker or queue degradation delays dispatch without changing payload processing.
+    procedure: Compare queue and execution duration, check incidents for the organization region, preserve failed-run evidence, and avoid unnecessary endpoint changes.
+    verification: Queue latency returns to baseline as the incident recovers and untouched customer endpoints resume normal delivery.
+  - slug: destination-rate-limits
+    title: Destination rate limits and retry backoff
+    area: rate_limits
+    version: "3.3"
+    status: current
+    summary: HTTP 429 responses are retried with exponential backoff and jitter, honoring Retry-After when it is valid.
+    signals: Runs show RATE_LIMITED, attempts are spaced progressively farther apart, and the destination supplies a quota response.
+    cause: The downstream service is accepting fewer requests than the integration currently emits.
+    procedure: Inspect Retry-After, reduce concurrency or batch size, and do not manually retry while an automatic retry is scheduled.
+    verification: Later attempts succeed without overlapping manual retries and destination quota metrics remain below the limit.
+  - slug: retry-idempotency
+    title: Preventing duplicate records during retries
+    area: data_integrity
+    version: "2.5"
+    status: current
+    summary: Acme preserves its delivery ID across automatic retries, but a manual replay creates a new delivery unless the destination uses the event id as an idempotency key.
+    signals: Downstream duplicates have different delivery IDs but the same source event ID after a manual replay.
+    cause: Replays are intentional new delivery attempts and cannot guarantee downstream deduplication without destination support.
+    procedure: Compare source event and delivery IDs, stop further replays, deduplicate downstream, and configure the event ID as the destination idempotency key.
+    verification: Replaying a controlled event leaves one downstream record and records the duplicate request as already processed.
+  - slug: log-retention
+    title: Log retention by plan
+    area: retention
+    version: "4.1"
+    status: current
+    summary: Starter retains seven days, Growth thirty days, Scale ninety days, and Enterprise three hundred sixty-five days of run logs.
+    signals: Older logs disappear exactly at the plan boundary while aggregate usage remains available.
+    cause: Detailed payload and execution logs are deleted according to the current organization plan, not the plan at run creation.
+    procedure: Confirm the organization plan and retention boundary, then use scheduled log export when longer external retention is required.
+    verification: The earliest visible log aligns with the documented plan boundary in UTC.
+  - slug: webhook-signatures
+    title: Debugging webhook signature verification
+    area: authentication
+    version: "3.2"
+    status: current
+    summary: Signatures cover the exact raw request body and endpoint-specific secret; parsing or re-encoding JSON before verification changes the bytes.
+    signals: One endpoint fails while another succeeds, and the failing service verifies a parsed body or uses the wrong endpoint secret.
+    cause: Whitespace, character encoding, body decompression, or secret selection differs before the HMAC comparison.
+    procedure: Capture raw bytes before parsing, select the secret for that endpoint, compute HMAC-SHA256, and compare in constant time.
+    verification: The locally computed signature matches the header for the unchanged raw payload.
+  - slug: environment-routing
+    title: Keeping sandbox and production routes isolated
+    area: configuration
+    version: "2.1"
+    status: current
+    summary: Environment belongs to the integration, while destinations are independent objects that can accidentally be attached to both environments.
+    signals: Sandbox events reach a production URL even though the integration badge is sandbox.
+    cause: The production destination was selected on the sandbox route or copied during integration duplication.
+    procedure: Inspect the route destination ID rather than its display name, detach the production destination, and attach a sandbox-only endpoint.
+    verification: A labeled sandbox test event appears only at the sandbox destination.
+  - slug: export-timezones
+    title: Time zones in CSV exports
+    area: scheduling
+    version: "2.2"
+    status: current
+    summary: Machine-readable CSV exports always encode timestamps in UTC with an explicit offset; workspace time zone affects the dashboard only.
+    signals: Export timestamps end in Z while dashboard timestamps are converted to the workspace zone.
+    cause: UTC makes exports stable across daylight saving changes and downstream systems.
+    procedure: Parse the ISO-8601 offset and convert downstream when local presentation is required; do not alter the workspace zone to change CSV output.
+    verification: Converting the UTC timestamp yields the same instant shown in the dashboard.
+  - slug: transient-delivery-errors
+    title: Handling intermittent 502 delivery errors
+    area: reliability
+    version: "3.4"
+    status: current
+    summary: A small number of HTTP 502 responses followed by successful retries indicate a transient destination or network error rather than a payload defect.
+    signals: Identical payloads succeed on retry, failures span unrelated events, and destination execution is otherwise healthy.
+    cause: A gateway or upstream service temporarily fails before the destination application processes the request.
+    procedure: Correlate failures by time and region, inspect incident status, allow automatic retries, and escalate only if the error rate or retry exhaustion threshold is reached.
+    verification: Automatic retries succeed and the rolling 502 rate returns below one percent.
+  - slug: sso-entitlements
+    title: SSO availability and administrator permissions
+    area: plan_access
+    version: "2.0"
+    status: current
+    summary: SAML SSO is available only on Enterprise plans and can be configured by organization owners, not workspace administrators.
+    signals: The SSO control is visible but disabled for a non-owner or for an organization on Starter, Growth, or Scale.
+    cause: SSO is an organization-level Enterprise entitlement with owner-only security permissions.
+    procedure: Confirm the organization plan and requester role, then involve an owner or upgrade through the normal billing process.
+    verification: An Enterprise organization owner can open configuration and validate IdP metadata.
+  - slug: api-key-rotation
+    title: API key rotation without downtime
+    area: authentication
+    version: "1.4"
+    status: current
+    summary: API keys support an overlap window, unlike webhook signing-secret rotation, so clients can migrate before revocation.
+    signals: Requests identify the old key fingerprint while both keys remain active.
+    cause: Key rotation is designed as a staged client migration.
+    procedure: Create a second key, deploy it, verify usage, then revoke the old fingerprint.
+    verification: No requests use the old key before revocation.
+  - slug: webhook-delivery-lifecycle
+    title: Webhook delivery lifecycle
+    area: delivery
+    version: "2.6"
+    status: current
+    summary: A delivery moves through queued, dispatched, acknowledged, retrying, and terminal states.
+    signals: Queue duration and execution duration identify whether delay happened inside Acme or at the destination.
+    cause: Lifecycle stages separate scheduling, worker dispatch, and destination response handling.
+    procedure: Compare timestamps before interpreting an overall duration.
+    verification: The stage with abnormal duration matches logs and metrics.
+  - slug: schedule-troubleshooting
+    title: Schedule troubleshooting checklist
+    area: scheduling
+    version: "1.8"
+    status: current
+    summary: Missing schedules should be checked for pause state, next-run preview, time zone, and recent deployment changes.
+    signals: A schedule can be healthy even when no UTC run appears on the expected UTC date.
+    cause: Most reports result from local-time interpretation or an intentional pause.
+    procedure: Work through state, calendar, time zone, and history in that order.
+    verification: The expected next run is visible and a test schedule fires.
+  - slug: oauth-reconnect-guide
+    title: Safe OAuth reconnection
+    area: authentication
+    version: "1.7"
+    status: current
+    summary: Reconnection replaces stored tokens but retains mappings and integration identity.
+    signals: The provider consent screen displays the account that will own future runs.
+    cause: Acme never asks operators to paste provider refresh tokens manually.
+    procedure: Pause new work, reconnect the intended account, validate scopes, then resume.
+    verification: A scoped test request succeeds for the intended tenant.
+  - slug: usage-metering
+    title: Reading the usage meter
+    area: billing
+    version: "2.2"
+    status: current
+    summary: Usage data can lag by five minutes and is grouped by organization billing period.
+    signals: Very recent runs are absent temporarily but appear after processing.
+    cause: Metering events are aggregated asynchronously.
+    procedure: Align the billing period and wait for the documented delay before reconciling.
+    verification: Counts stabilize after the delay.
+  - slug: mapping-test-mode
+    title: Mapping test mode
+    area: data_mapping
+    version: "2.0"
+    status: current
+    summary: Test mode previews transformations without sending the result to a production destination.
+    signals: Preview output includes schema fingerprint and mapping version.
+    cause: Safe iteration requires separating transformation validation from delivery.
+    procedure: Use a representative redacted payload and review every required field.
+    verification: The preview matches the destination contract.
+  - slug: pause-audit-events
+    title: Reading pause audit events
+    area: configuration
+    version: "1.9"
+    status: current
+    summary: Audit events distinguish user actions, API actions, system auto-pause, and policy enforcement.
+    signals: Actor, reason code, and correlation ID identify the trigger.
+    cause: Display timestamps alone cannot establish who initiated a pause.
+    procedure: Inspect actor and reason before resuming.
+    verification: The resolved cause matches preceding run failures.
+  - slug: regional-routing
+    title: Regional routing model
+    area: reliability
+    version: "1.5"
+    status: current
+    summary: An organization's home region determines its primary queue and worker fleet.
+    signals: Regional incidents affect organizations by home region rather than destination geography.
+    cause: Data residency and predictable latency require stable regional affinity.
+    procedure: Use organization region when correlating incidents.
+    verification: Affected cases share the incident region.
+  - slug: retry-policy
+    title: Retry classification policy
+    area: reliability
+    version: "2.8"
+    status: current
+    summary: Timeouts, 429, and most 5xx responses are transient; authentication and validation 4xx responses are permanent.
+    signals: The run records a retry classification and next-attempt time.
+    cause: Retrying permanent errors wastes quota and increases destination load.
+    procedure: Resolve permanent errors before manual replay and allow automatic handling for transient errors.
+    verification: The chosen action matches the recorded classification.
+  - slug: deduplication-keys
+    title: Designing destination deduplication keys
+    area: data_integrity
+    version: "1.6"
+    status: current
+    summary: Stable source event IDs are better deduplication keys than delivery attempt IDs.
+    signals: Multiple deliveries share one event ID during replay or redrive workflows.
+    cause: Attempt identifiers deliberately change for separately requested deliveries.
+    procedure: Persist the source event ID with a uniqueness rule at the destination.
+    verification: Duplicate attempts return the original result without another write.
+  - slug: log-export
+    title: Exporting logs for long-term retention
+    area: retention
+    version: "1.3"
+    status: current
+    summary: Scheduled exports can send redacted run metadata to customer-controlled storage before plan retention expires.
+    signals: Export jobs show the destination bucket and most recent checkpoint.
+    cause: Acme retention controls primary logs, not customer copies.
+    procedure: Configure a least-privilege destination and test retrieval.
+    verification: Exported records remain accessible after Acme retention expires.
+  - slug: signature-debugging
+    title: Signature debugging checklist
+    area: authentication
+    version: "1.8"
+    status: current
+    summary: Debug signature failures by preserving raw bytes, timestamp header, endpoint ID, and key fingerprint.
+    signals: Framework body parsers are a common source of byte changes.
+    cause: HMAC equality requires identical bytes and secret.
+    procedure: Log hashes rather than secrets and compare each input independently.
+    verification: A local reproduction matches the request header.
+  - slug: environment-isolation
+    title: Environment isolation checklist
+    area: configuration
+    version: "1.5"
+    status: current
+    summary: Unique destination IDs, credentials, and naming conventions prevent sandbox-to-production routing mistakes.
+    signals: Duplicate display names conceal different or shared destination IDs.
+    cause: Display names are descriptive and do not enforce isolation.
+    procedure: Audit object IDs and apply environment-specific labels.
+    verification: Cross-environment test events are rejected.
+  - slug: csv-export-guide
+    title: Consuming CSV exports
+    area: exports
+    version: "1.7"
+    status: current
+    summary: CSV timestamps are ISO-8601 UTC and identifiers must be treated as strings.
+    signals: Spreadsheet software may reformat timestamps or long identifiers.
+    cause: CSV has no native schema metadata.
+    procedure: Import with explicit column types and convert time zones downstream.
+    verification: Row IDs and instants match the API representation.
+  - slug: incident-correlation
+    title: Correlating support cases with incidents
+    area: reliability
+    version: "2.1"
+    status: current
+    summary: Correlation requires overlapping time, region, affected component, and matching failure mode.
+    signals: A nearby incident is not evidence when the customer region or error differs.
+    cause: Broad incident timelines create tempting but false associations.
+    procedure: Validate all four correlation dimensions before citing an incident.
+    verification: Incident scope directly explains the observed runs.
+  - slug: integration-health-states
+    title: Integration health states
+    area: operations
+    version: "1.5"
+    status: current
+    summary: Connected, degraded, paused, expired, and disabled describe different operational conditions.
+    signals: Health combines credentials, recent runs, and operator state.
+    cause: One status cannot describe every failure dimension.
+    procedure: Read the status reason alongside the label.
+    verification: The recommended action addresses the status reason.
+  - slug: job-run-statuses
+    title: Job run status reference
+    area: operations
+    version: "1.9"
+    status: current
+    summary: Run status is distinct from integration health and from destination acknowledgement.
+    signals: A succeeded run has a terminal acknowledged destination response.
+    cause: Queue and attempt state transitions are recorded independently.
+    procedure: Use the full run timeline for support diagnosis.
+    verification: Terminal state agrees with the last attempt.
+  - slug: support-severity
+    title: Support severity classification
+    area: support
+    version: "2.0"
+    status: current
+    summary: Urgent cases involve active production impact, data integrity, or security exposure.
+    signals: Business impact and available workaround determine severity more than error wording.
+    cause: Consistent severity enables reliable response prioritization.
+    procedure: Record scope, impact, start time, and workaround.
+    verification: Priority follows the published rubric.
+  - slug: legacy-retry-policy
+    title: Legacy fixed retry timing
+    area: reliability
+    version: "1.0"
+    status: superseded
+    superseded_by: destination-rate-limits
+    summary: This retired policy used a fixed five-minute retry interval for all retryable responses.
+    signals: The page describes behavior before exponential backoff was introduced.
+    cause: Fixed retries caused synchronized load and ignored Retry-After.
+    procedure: Do not use this page for current investigations; follow Destination rate limits and retry backoff.
+    verification: Current runs display variable retry intervals.
+  - slug: legacy-log-retention
+    title: Legacy thirty-day log retention
+    area: retention
+    version: "1.1"
+    status: superseded
+    superseded_by: log-retention
+    summary: This retired policy stated that every organization retained logs for thirty days.
+    signals: It does not mention plan-specific retention.
+    cause: Retention became plan-based after storage policy changes.
+    procedure: Use the current Log retention by plan page.
+    verification: The organization plan determines the boundary.
+  - slug: legacy-csv-local-time
+    title: Legacy local-time CSV exports
+    area: exports
+    version: "0.9"
+    status: superseded
+    superseded_by: export-timezones
+    summary: Early CSV exports rendered timestamps using workspace local time.
+    signals: Examples omit an explicit UTC offset.
+    cause: Ambiguous daylight saving timestamps led to the UTC export standard.
+    procedure: Follow the current Time zones in CSV exports page.
+    verification: Current exports use an explicit Z suffix.
+  - slug: legacy-sso-scale
+    title: Legacy Scale plan SSO preview
+    area: plan_access
+    version: "0.8"
+    status: superseded
+    superseded_by: sso-entitlements
+    summary: A limited preview temporarily exposed SSO to selected Scale organizations.
+    signals: The page mentions preview enrollment and has no current entitlement table.
+    cause: The preview ended before general availability on Enterprise.
+    procedure: Use the current SSO availability page.
+    verification: Current entitlement is Enterprise only.
+  - slug: legacy-signature-json
+    title: Legacy parsed-JSON signature example
+    area: authentication
+    version: "1.0"
+    status: superseded
+    superseded_by: webhook-signatures
+    summary: An old example incorrectly serialized parsed JSON before signature verification.
+    signals: The sample calls JSON stringify before calculating HMAC.
+    cause: Re-serialization changes bytes and creates intermittent verification failures.
+    procedure: Use the current raw-body signature guide.
+    verification: Current examples hash request bytes before parsing.
+

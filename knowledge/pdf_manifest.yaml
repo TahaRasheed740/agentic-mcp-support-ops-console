@@ -1,0 +1,14 @@
+documents:
+  - slug: eu-latency-incident-review
+    title: Incident review - EU delivery latency
+    area: reliability
+    version: "1.0"
+    status: current
+    filename: acme-incident-review-eu-latency.pdf
+  - slug: support-troubleshooting-handbook
+    title: Support troubleshooting field handbook
+    area: support
+    version: "1.0"
+    status: current
+    filename: acme-support-troubleshooting-handbook.pdf
+

@@ -1,0 +1,144 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tracedesk}
+      POSTGRES_USER: ${POSTGRES_USER:-tracedesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tracedesk_dev}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tracedesk} -d ${POSTGRES_DB:-tracedesk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://tracedesk:tracedesk_dev@postgres:5432/tracedesk}
+      KNOWLEDGE_DIR: knowledge
+      PDF_DIR: output/pdf
+      RETRIEVAL_REPORT_DIR: reports/retrieval
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      EMBEDDING_CACHE_DIR: /model-cache/fastembed
+      KNOWLEDGE_MCP_URL: http://knowledge-mcp:8000/mcp
+      OPERATIONS_MCP_URL: http://operations-mcp:8000/mcp
+      SUPPORT_MCP_URL: http://support-mcp:8000/mcp
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_ROUTER_MODEL: ${CLAUDE_ROUTER_MODEL:-claude-haiku-4-5}
+      CLAUDE_INVESTIGATOR_MODEL: ${CLAUDE_INVESTIGATOR_MODEL:-claude-sonnet-4-5}
+      CLAUDE_REQUEST_TIMEOUT_SECONDS: ${CLAUDE_REQUEST_TIMEOUT_SECONDS:-90}
+      CLAUDE_RATE_LIMIT_RETRY_SECONDS: ${CLAUDE_RATE_LIMIT_RETRY_SECONDS:-65}
+      INVESTIGATION_MAX_TOOL_CALLS: ${INVESTIGATION_MAX_TOOL_CALLS:-30}
+      INVESTIGATION_MAX_ROUNDS: ${INVESTIGATION_MAX_ROUNDS:-4}
+      INVESTIGATION_SPECIALIST_MAX_ROUNDS: ${INVESTIGATION_SPECIALIST_MAX_ROUNDS:-2}
+      INVESTIGATION_TOKEN_BUDGET: ${INVESTIGATION_TOKEN_BUDGET:-65000}
+    command: ["sh", "-c", "alembic upgrade head && python -m tracedesk_api.seed && python -m tracedesk_api.knowledge_ingest && uvicorn tracedesk_api.main:app --host 0.0.0.0 --port 8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      knowledge-mcp:
+        condition: service_healthy
+      operations-mcp:
+        condition: service_healthy
+      support-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${API_PORT:-8001}:8000"
+    volumes:
+      - embedding_model_cache:/model-cache
+
+  knowledge-mcp:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://tracedesk:tracedesk_dev@postgres:5432/tracedesk}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      EMBEDDING_CACHE_DIR: /model-cache/fastembed
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000
+    command: ["python", "-m", "tracedesk_api.mcp_layer.server_cli", "knowledge"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8000), 2).close()"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "8101:8000"
+    volumes:
+      - embedding_model_cache:/model-cache
+
+  operations-mcp:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://tracedesk:tracedesk_dev@postgres:5432/tracedesk}
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000
+    command: ["python", "-m", "tracedesk_api.mcp_layer.server_cli", "operations"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8000), 2).close()"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "8102:8000"
+
+  support-mcp:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://tracedesk:tracedesk_dev@postgres:5432/tracedesk}
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000
+    command: ["python", "-m", "tracedesk_api.mcp_layer.server_cli", "support"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8000), 2).close()"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "8103:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+    environment:
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api:8000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  embedding_model_cache:

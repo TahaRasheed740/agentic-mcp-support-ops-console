@@ -1,0 +1,155 @@
+{
+  "tickets": [
+    "TKT-1001",
+    "TKT-1007",
+    "TKT-1013"
+  ],
+  "completed": 3,
+  "all_completed": true,
+  "required_source_success_rate": 1.0,
+  "citation_validity_rate": 1.0,
+  "unauthorized_write_count": 0,
+  "cases": [
+    {
+      "ticket_id": "TKT-1001",
+      "investigation_id": "df3d777c-14b3-4907-a71f-c130ccf5ac41",
+      "status": "completed",
+      "classification": {
+        "category": "Webhook Authentication Failure",
+        "urgency": "urgent",
+        "complexity": "moderate",
+        "summary": "Production webhook integration returning 401 unauthorized responses following credential rotation, blocking all payload deliveries since 09:20 UTC.",
+        "rationale": "Customer reports authentication failure immediately after credential rotation with complete delivery stoppage in production environment. High priority case with clear temporal correlation to configuration change. Requires investigation of credential synchronization between Acme platform and webhook endpoint, and verification of stored credentials against rotated values."
+      },
+      "root_cause": "The webhook signing secret was rotated in the Acme Automations platform at approximately 09:20 UTC on June 15, 2026, activating a new secret immediately. The destination endpoint was not updated with the corresponding new secret and continues to validate incoming webhook signatures against the old secret. Because Acme webhook secrets activate immediately without an overlap window, all delivery attempts since rotation fail authentication at the destination.",
+      "confidence": "high",
+      "required_sources": [
+        "webhook-authentication"
+      ],
+      "required_sources_found": [
+        "webhook-authentication"
+      ],
+      "all_required_sources_found": true,
+      "citation_ids": [
+        "E1",
+        "E10",
+        "E2",
+        "E5",
+        "E9"
+      ],
+      "citation_valid": true,
+      "tool_names": [
+        "list_recent_runs",
+        "list_incidents",
+        "get_integration",
+        "get_run_logs",
+        "search_knowledge",
+        "get_run_logs",
+        "search_knowledge",
+        "search_knowledge"
+      ],
+      "write_tools_used": false,
+      "usage": {
+        "input_tokens": 30003,
+        "output_tokens": 2301,
+        "cache_read_tokens": 8108,
+        "cache_creation_tokens": 0,
+        "tool_calls": 8
+      },
+      "error": null
+    },
+    {
+      "ticket_id": "TKT-1007",
+      "investigation_id": "fd234db3-bd3d-4d26-b9ed-a2df598e1c8e",
+      "status": "completed",
+      "classification": {
+        "category": "Webhook Delivery Performance",
+        "urgency": "urgent",
+        "complexity": "complex",
+        "summary": "EU webhook deliveries experiencing severe latency increase from seconds to 12+ minutes while US deliveries remain normal, affecting production webhook integration for Scale plan customer.",
+        "rationale": "Regional performance degradation in production webhook delivery indicates potential infrastructure, routing, or service-level issue specific to EU infrastructure. The dramatic latency increase (seconds to 12+ minutes) and geographic isolation (EU only) suggest infrastructure or regional configuration problem rather than customer-side issue. Urgent classification justified by production impact and customer visibility. Complex investigation required to isolate regional infrastructure, integration configuration, and service health factors."
+      },
+      "root_cause": "A deployment changed worker lease renewal timing in the eu-west region, causing uneven partition ownership. Several workers retained fewer partitions while two workers accumulated a backlog. Automatic scaling added capacity but did not immediately rebalance existing leases, resulting in elevated queue age for webhook deliveries assigned to the affected region.",
+      "confidence": "high",
+      "required_sources": [
+        "eu-latency-incident-review",
+        "regional-delivery-latency"
+      ],
+      "required_sources_found": [
+        "eu-latency-incident-review",
+        "regional-delivery-latency"
+      ],
+      "all_required_sources_found": true,
+      "citation_ids": [
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "citation_valid": true,
+      "tool_names": [
+        "get_integration",
+        "list_incidents",
+        "list_recent_runs",
+        "get_run_logs",
+        "get_run_logs",
+        "search_knowledge",
+        "get_run_logs"
+      ],
+      "write_tools_used": false,
+      "usage": {
+        "input_tokens": 24136,
+        "output_tokens": 2863,
+        "cache_read_tokens": 9312,
+        "cache_creation_tokens": 0,
+        "tool_calls": 7
+      },
+      "error": null
+    },
+    {
+      "ticket_id": "TKT-1013",
+      "investigation_id": "a74cbee7-7ed5-4595-b735-cf33e7774849",
+      "status": "completed",
+      "classification": {
+        "category": "Data Export Timezone Handling",
+        "urgency": "normal",
+        "complexity": "moderate",
+        "summary": "CSV exports from Acme Automations are returning timestamps in UTC instead of respecting the workspace's configured America/New_York timezone setting.",
+        "rationale": "This is a data accuracy issue affecting scheduling workflows where timezone representation matters for downstream processing. The workspace has explicitly configured a non-UTC timezone, but the export function is not honoring this setting. The issue is reproducible (user has downloaded exports), affects a Starter plan organization, and requires investigation into the export pipeline's timezone handling logic. Moderate complexity due to potential involvement of multiple system layers (workspace config, export service, integration)."
+      },
+      "root_cause": "The customer expects CSV exports to reflect the workspace timezone configuration (America/New_York), but the export service is designed to always output timestamps in UTC with explicit ISO-8601 offset notation. This is intentional architecture to maintain data integrity across timezone boundaries and daylight saving changes.",
+      "confidence": "high",
+      "required_sources": [
+        "export-timezones"
+      ],
+      "required_sources_found": [
+        "export-timezones"
+      ],
+      "all_required_sources_found": true,
+      "citation_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "citation_valid": true,
+      "tool_names": [
+        "search_knowledge",
+        "get_integration",
+        "list_incidents",
+        "list_recent_runs",
+        "get_run_logs",
+        "search_knowledge"
+      ],
+      "write_tools_used": false,
+      "usage": {
+        "input_tokens": 23850,
+        "output_tokens": 1895,
+        "cache_read_tokens": 6081,
+        "cache_creation_tokens": 2027,
+        "tool_calls": 6
+      },
+      "error": null
+    }
+  ]
+}
