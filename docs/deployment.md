@@ -9,7 +9,7 @@ credits.
 
 Use this mode for public hosting:
 
-- Recorded replays are public.
+- Recorded replays are public after they have been exported from real live runs.
 - Knowledge search, support cases, MCP tool explorer, and evaluations are public.
 - Live Claude investigations are disabled.
 - `ANTHROPIC_API_KEY` is not configured in the hosted environment.
@@ -67,10 +67,10 @@ ingest knowledge documents when empty, and then start Uvicorn.
 After deployment, verify:
 
 - `/` loads the support queue.
-- `/replays` loads recorded replays.
-- Four replay scenarios are listed.
-- A replay clearly states that it does not call Claude.
-- Replay controls can step through the recorded investigation events.
+- `/replays` loads without live Claude access.
+- Captured replay scenarios are listed only after real local investigations have been exported.
+- A replay clearly states that playback does not call Claude.
+- Replay controls can step through recorded investigation events when captured fixtures exist.
 - `/knowledge` returns evidence results.
 - `/tools` opens the MCP tool explorer.
 - `/evaluations` shows the latest deterministic and model-judge report.

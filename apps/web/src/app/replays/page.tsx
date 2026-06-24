@@ -19,7 +19,7 @@ export default function ReplaysPage() {
         </section>
 
         <section className="replay-list">
-          {replayScenarios.map((scenario) => (
+          {replayScenarios.length ? replayScenarios.map((scenario) => (
             <Link className="replay-card panel" href={`/replays/${scenario.id}`} key={scenario.id}>
               <div>
                 <span className="panel-label">{scenario.caseId} / {scenario.duration}</span>
@@ -30,7 +30,15 @@ export default function ReplaysPage() {
                 {scenario.tags.map((tag) => <span key={tag}>{tag}</span>)}
               </div>
             </Link>
-          ))}
+          )) : (
+            <div className="panel empty-state">
+              <span>No captured replays yet</span>
+              <p>
+                Replays will appear here after live Claude investigations are run locally and exported.
+                No scripted or simulated replay is being presented as a recording.
+              </p>
+            </div>
+          )}
         </section>
       </main>
     </AppShell>
