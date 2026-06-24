@@ -68,9 +68,9 @@ After deployment, verify:
 
 - `/` loads the support queue.
 - `/replays` loads without live Claude access.
-- Captured replay scenarios are listed only after real local investigations have been exported.
+- Four captured replay scenarios are listed.
 - A replay clearly states that playback does not call Claude.
-- Replay controls can step through recorded investigation events when captured fixtures exist.
+- Replay controls can step through recorded investigation events.
 - `/knowledge` returns evidence results.
 - `/tools` opens the MCP tool explorer.
 - `/evaluations` shows the latest deterministic and model-judge report.

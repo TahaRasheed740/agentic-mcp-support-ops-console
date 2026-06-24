@@ -191,8 +191,8 @@ limits, and 65,000 cumulative input, output, and cache tokens. See
 Open [recorded replays](http://localhost:3000/replays) for an anonymous public
 demo that does not call Claude or mutate support state. Replay playback supports
 progressive event reveal, specialist reports, evidence citations, drafted
-responses, and approval queues, but replay fixtures should be added only after
-real local live investigations have been exported.
+responses, and approval queues. The included replay fixtures were exported from
+real completed local live investigations.
 
 Run the deterministic evaluation suite with:
 

@@ -1,0 +1,34 @@
+[
+  {
+    "investigationId": "a6696d9b-a371-454c-bf9d-174b44e3eac3",
+    "slug": "eu-webhook-latency",
+    "title": "EU Webhook Latency",
+    "summary": "A real captured investigation of regional EU webhook latency, incident correlation, evidence gathering, and customer-safe no-action guidance.",
+    "duration": "captured live run",
+    "tags": ["Reliability", "Incident correlation", "Captured run"]
+  },
+  {
+    "investigationId": "4e20515f-459e-4604-848d-9bd448bc57a3",
+    "slug": "webhook-secret-rotation",
+    "title": "Webhook 401 After Secret Rotation",
+    "summary": "A real captured investigation of post-rotation webhook 401 failures, authentication evidence, and secret validation guidance.",
+    "duration": "captured live run",
+    "tags": ["Authentication", "Webhook", "Captured run"]
+  },
+  {
+    "investigationId": "dc24c653-4c9f-4b33-ae94-617a904c5112",
+    "slug": "stripe-schema-mapping",
+    "title": "Stripe Schema Mapping Change",
+    "summary": "A real captured investigation of Stripe payload schema changes, mapping evidence, and preview-first remediation guidance.",
+    "duration": "captured live run",
+    "tags": ["Data mapping", "Schema change", "Captured run"]
+  },
+  {
+    "investigationId": "e4ff88c8-83e0-448a-b3d1-35f2a6e87a3a",
+    "slug": "salesforce-oauth-expiration",
+    "title": "Salesforce OAuth Expiration",
+    "summary": "A real captured investigation of Salesforce OAuth expiration, token lifecycle evidence, and account-safe reauthorization guidance.",
+    "duration": "captured live run",
+    "tags": ["OAuth", "Token lifecycle", "Captured run"]
+  }
+]
