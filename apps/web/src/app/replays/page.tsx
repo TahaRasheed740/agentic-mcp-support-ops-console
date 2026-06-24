@@ -11,8 +11,8 @@ export default function ReplaysPage() {
             <p className="eyebrow">Anonymous demo mode</p>
             <h1>Recorded replays</h1>
             <p>
-              Watch canonical investigations without an Anthropic API key. Replays use frozen synthetic data and
-              clearly separate demonstration playback from live execution.
+              Watch captured investigations without an Anthropic API key. Replays are exported from real local Claude
+              runs and play back safely without live execution.
             </p>
           </div>
           <span className="queue-total">{replayScenarios.length} replay scenarios</span>

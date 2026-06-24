@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { isPublicDemo } from "@/lib/config";
 import { PersonaSwitcher } from "./persona-switcher";
 
 export function AppShell({
@@ -40,14 +41,18 @@ export function AppShell({
           </Link>
         </nav>
         <div className="iteration-card">
-          <span>Portfolio demo</span>
-          <strong>Replay-safe public mode</strong>
-          <p>Visitors can explore captured Claude investigations without spending API credits or changing support data.</p>
+          <span>{isPublicDemo ? "Public demo" : "Portfolio demo"}</span>
+          <strong>{isPublicDemo ? "Replay-safe mode" : "Replay-safe public mode"}</strong>
+          <p>
+            {isPublicDemo
+              ? "Explore captured Claude investigations without credentials, live API calls, or backend writes."
+              : "Visitors can explore captured Claude investigations without spending API credits or changing support data."}
+          </p>
         </div>
       </aside>
       <div className="workspace">
         <header className="topbar">
-          <div className="environment"><span />Demo environment</div>
+          <div className="environment"><span />{isPublicDemo ? "Public replay demo" : "Demo environment"}</div>
           <PersonaSwitcher />
         </header>
         {children}

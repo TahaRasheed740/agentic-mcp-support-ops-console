@@ -1,8 +1,22 @@
 import { AppShell } from "@/components/app-shell";
+import { PublicDemoNotice } from "@/components/public-demo-notice";
 import { ToolExplorer } from "@/components/tool-explorer";
 import { getMCPCatalog } from "@/lib/api";
+import { isPublicDemo } from "@/lib/config";
 
 export default async function ToolsPage() {
+  if (isPublicDemo) {
+    return (
+      <AppShell active="mcp">
+        <PublicDemoNotice
+          eyebrow="Protocol workbench"
+          title="MCP tool explorer"
+          description="The knowledge, operations, and support MCP tools run in the full local Docker stack. The public demo shows their captured outputs inside replayed investigations instead of exposing live tool calls."
+        />
+      </AppShell>
+    );
+  }
+
   const catalog = await getMCPCatalog();
   const toolCount = catalog.servers.reduce((total, server) => total + server.tools.length, 0);
 

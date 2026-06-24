@@ -1,8 +1,22 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
+import { PublicDemoNotice } from "@/components/public-demo-notice";
 import { formatDate, getInvestigations, titleCase } from "@/lib/api";
+import { isPublicDemo } from "@/lib/config";
 
 export default async function InvestigationsPage() {
+  if (isPublicDemo) {
+    return (
+      <AppShell active="investigation">
+        <PublicDemoNotice
+          eyebrow="Live investigation history"
+          title="Investigations"
+          description="Live Claude investigation history belongs to the full local stack. In the public demo, the same investigation experience is available through captured replay scenarios."
+        />
+      </AppShell>
+    );
+  }
+
   const investigations = await getInvestigations();
 
   return (

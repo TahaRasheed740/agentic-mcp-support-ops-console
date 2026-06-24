@@ -93,6 +93,10 @@ a.case-row:hover { background: #faf8f2; }
 .index-subtext { margin-top: 5px; display: block; color: var(--muted); font-size: 0.66rem; }
 .empty-state { padding: 70px 20px; text-align: center; }
 .empty-state p { color: var(--muted); }
+.demo-notice { margin-top: 32px; padding: 24px; }
+.demo-notice h2 { margin: 8px 0 12px; font-family: Georgia, serif; font-size: 1.65rem; font-weight: 400; }
+.demo-notice p { max-width: 780px; margin: 0; color: var(--muted); line-height: 1.65; }
+.demo-actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .pagination { padding: 14px 18px; display: flex; align-items: center; justify-content: flex-end; gap: 16px; color: var(--muted); border-top: 1px solid var(--line); font-size: 0.74rem; }
 .page-link { padding: 7px 10px; color: var(--green); background: var(--green-soft); border-radius: 6px; font-weight: 700; text-decoration: none; }
 .page-link.disabled { color: #9da49f; background: #eeece6; }

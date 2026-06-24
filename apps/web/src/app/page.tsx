@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
+import { isPublicDemo } from "@/lib/config";
 import { formatDate, getCases, titleCase } from "@/lib/api";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function SupportQueue({ searchParams }: { searchParams: SearchParams }) {
+  if (isPublicDemo) return <PublicDemoHome />;
+
   const params = await searchParams;
   const status = singleValue(params.status);
   const priority = singleValue(params.priority);
@@ -94,6 +97,52 @@ export default async function SupportQueue({ searchParams }: { searchParams: Sea
               />
             </div>
           )}
+        </section>
+      </main>
+    </AppShell>
+  );
+}
+
+function PublicDemoHome() {
+  return (
+    <AppShell active="replays">
+      <main className="content">
+        <section className="page-heading">
+          <div>
+            <p className="eyebrow">Public replay demo</p>
+            <h1>TraceDesk</h1>
+            <p>
+              Explore real captured Claude investigation runs from an agentic support operations console. This hosted
+              demo is replay-safe: it does not call Claude, require credentials, or change support data.
+            </p>
+          </div>
+          <Link className="evidence-button" href="/replays">Open recorded replays</Link>
+        </section>
+
+        <section className="metric-grid">
+          <Metric label="Captured replays" value={4} tone="green" />
+          <Metric label="MCP services" value={3} tone="blue" />
+          <Metric label="Benchmark cases" value={15} tone="purple" />
+          <Metric label="Public API spend" value={0} tone="orange" />
+        </section>
+
+        <section className="panel demo-notice">
+          <span className="panel-label">What this shows</span>
+          <h2>Replay-safe view of the full system</h2>
+          <p>
+            The public link focuses on step-by-step investigation playback: routing, tool calls, evidence, specialist
+            reports, citations, drafted responses, and approval queues. The repository contains the complete local
+            stack for live Claude investigations, RAG over synthetic documentation, MCP tools, evaluations, and Docker.
+          </p>
+          <div className="demo-actions">
+            <Link className="evidence-button" href="/replays">Start with replays</Link>
+            <a
+              className="page-link"
+              href="https://github.com/TahaRasheed740/agentic-mcp-support-ops-console"
+            >
+              View full repository
+            </a>
+          </div>
         </section>
       </main>
     </AppShell>

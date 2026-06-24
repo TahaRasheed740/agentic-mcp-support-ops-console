@@ -194,6 +194,12 @@ progressive event reveal, specialist reports, evidence citations, drafted
 responses, and approval queues. The included replay fixtures were exported from
 real completed local live investigations.
 
+The hosted portfolio version runs as a frontend-only public replay demo. It keeps
+captured investigation playback available while avoiding public Claude API usage,
+database access, and backend writes. The full Dockerized backend, MCP services,
+RAG pipeline, evaluations, and live investigation flow remain available for
+local/private demos.
+
 Run the deterministic evaluation suite with:
 
 ```powershell

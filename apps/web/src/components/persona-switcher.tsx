@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { DemoSession, Persona } from "@/lib/api";
+import { isPublicDemo } from "@/lib/config";
 
 const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8001";
 
@@ -12,6 +13,7 @@ export function PersonaSwitcher() {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isPublicDemo) return;
     async function load() {
       const [personasResponse, sessionResponse] = await Promise.all([
         fetch(`${publicApiUrl}/api/v1/personas`, { credentials: "include" }),
@@ -22,6 +24,14 @@ export function PersonaSwitcher() {
     }
     void load();
   }, []);
+
+  if (isPublicDemo) {
+    return (
+      <div className="persona-control">
+        <span className="session-message">Replay-only public demo</span>
+      </div>
+    );
+  }
 
   async function choosePersona(personaId: string) {
     setBusy(true);
@@ -89,4 +99,3 @@ export function PersonaSwitcher() {
     </div>
   );
 }
-

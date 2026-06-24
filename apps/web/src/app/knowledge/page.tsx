@@ -1,11 +1,25 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { EvidenceExcerpt } from "@/components/evidence-excerpt";
+import { PublicDemoNotice } from "@/components/public-demo-notice";
 import { searchKnowledge, titleCase } from "@/lib/api";
+import { isPublicDemo } from "@/lib/config";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function KnowledgePage({ searchParams }: { searchParams: SearchParams }) {
+  if (isPublicDemo) {
+    return (
+      <AppShell active="knowledge">
+        <PublicDemoNotice
+          eyebrow="Evidence library"
+          title="Knowledge search"
+          description="Hybrid BM25 plus vector retrieval is part of the full local stack. The public deployment keeps this page read-only so the hosted demo does not need the backend or pgvector database."
+        />
+      </AppShell>
+    );
+  }
+
   const params = await searchParams;
   const query = singleValue(params.q) ?? "";
   const requestedMode = singleValue(params.mode);

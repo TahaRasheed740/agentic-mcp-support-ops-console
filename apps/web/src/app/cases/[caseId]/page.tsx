@@ -2,10 +2,24 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { InvestigationLaunchButton } from "@/components/investigation-launch-button";
+import { PublicDemoNotice } from "@/components/public-demo-notice";
 import { formatDate, getCase, getRuntimeCapabilities, titleCase } from "@/lib/api";
+import { isPublicDemo } from "@/lib/config";
 
 export default async function CasePage({ params }: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await params;
+  if (isPublicDemo) {
+    return (
+      <AppShell>
+        <PublicDemoNotice
+          eyebrow="Support queue"
+          title={caseId}
+          description="Individual support cases are loaded from the full local backend. For the public deployment, use captured replays to inspect complete investigation flows safely."
+        />
+      </AppShell>
+    );
+  }
+
   const [supportCase, runtime] = await Promise.all([
     getCase(caseId),
     getRuntimeCapabilities(),
