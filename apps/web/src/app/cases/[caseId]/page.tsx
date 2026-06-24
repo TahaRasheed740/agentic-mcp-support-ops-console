@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { InvestigationLaunchButton } from "@/components/investigation-launch-button";
-import { formatDate, getCase, titleCase } from "@/lib/api";
+import { formatDate, getCase, getRuntimeCapabilities, titleCase } from "@/lib/api";
 
 export default async function CasePage({ params }: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await params;
-  const supportCase = await getCase(caseId);
+  const [supportCase, runtime] = await Promise.all([
+    getCase(caseId),
+    getRuntimeCapabilities(),
+  ]);
   if (!supportCase) notFound();
 
   return (
@@ -29,7 +32,7 @@ export default async function CasePage({ params }: { params: Promise<{ caseId: s
             >
               Find evidence
             </Link>
-            <InvestigationLaunchButton caseId={supportCase.id} />
+            <InvestigationLaunchButton caseId={supportCase.id} runtime={runtime} />
           </div>
         </section>
 

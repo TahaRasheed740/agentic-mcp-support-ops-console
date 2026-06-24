@@ -9,13 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from tracedesk_api.config import get_settings
 from tracedesk_api.database import create_engine, database_is_ready
 from tracedesk_api.investigations.manager import InvestigationManager
+from tracedesk_api.live_access import live_investigation_capability
 from tracedesk_api.routers.cases import router as cases_router
 from tracedesk_api.routers.evaluations import router as evaluations_router
 from tracedesk_api.routers.investigations import router as investigations_router
 from tracedesk_api.routers.knowledge import router as knowledge_router
 from tracedesk_api.routers.sessions import router as sessions_router
 from tracedesk_api.routers.tools import router as tools_router
-from tracedesk_api.schemas import LiveHealth, ReadyHealth
+from tracedesk_api.schemas import LiveHealth, ReadyHealth, RuntimeCapabilities
 
 
 @asynccontextmanager
@@ -48,6 +49,18 @@ app.include_router(investigations_router)
 @app.get("/health/live", response_model=LiveHealth, tags=["health"])
 async def live() -> LiveHealth:
     return LiveHealth()
+
+
+@app.get("/api/v1/runtime", response_model=RuntimeCapabilities, tags=["runtime"])
+async def runtime() -> RuntimeCapabilities:
+    settings = get_settings()
+    live_enabled, reason = live_investigation_capability(settings)
+    return RuntimeCapabilities(
+        app_env=settings.app_env,
+        live_investigations_enabled=live_enabled,
+        live_investigations_reason=reason,
+        public_replay_only=not live_enabled,
+    )
 
 
 @app.get(

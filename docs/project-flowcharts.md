@@ -123,7 +123,7 @@ flowchart TD
     B --> C["Review case details<br/>customer, integration, recent runs, incidents"]
     C --> D{"Need AI investigation?"}
     D -- No --> E["Use manual context and knowledge search"]
-    D -- Yes --> F["Enter live access code if required<br/>then click Investigate with Claude"]
+    D -- Yes --> F["If local live mode is enabled<br/>click Investigate with Claude"]
     F --> G["Live investigation workspace opens"]
     G --> H["Watch streamed agent timeline"]
     H --> I["Review evidence and citations"]
@@ -149,10 +149,10 @@ sequenceDiagram
     participant MCP as MCP Services
     participant DB as PostgreSQL
 
-    UI->>API: Start investigation for ticket with optional live access code
-    API->>API: Check ANTHROPIC_API_KEY and production access-code gate
+    UI->>API: Start investigation for ticket
+    API->>API: Check LIVE_INVESTIGATIONS_ENABLED and ANTHROPIC_API_KEY
     alt Live access denied
-        API-->>UI: Return protected-live-mode error
+        API-->>UI: Return replay-only/live-disabled message
     else Live access allowed
     API->>MCP: support.get_case
     MCP->>DB: Read ticket and session overlay
@@ -256,7 +256,7 @@ flowchart LR
     Visitor["Visitor / recruiter"] --> Replay["Recorded replay mode"]
     Replay --> Frozen["Frozen investigation data<br/>no Claude call, no writes, no cost"]
 
-    Reviewer["Trusted reviewer"] --> LiveGate{"Valid live access code<br/>and API key available?"}
+    Maintainer["Maintainer locally"] --> LiveGate{"Local live mode enabled<br/>and API key available?"}
     LiveGate -- No --> Replay
     LiveGate -- Yes --> Live["Live Claude investigation"]
     Live --> Cost["Uses Anthropic API key<br/>token cost and rate limits apply"]
@@ -265,8 +265,9 @@ flowchart LR
 Recommended deployment stance:
 
 - Public: replay mode, docs, evaluation report, screenshots, demo video.
-- Protected: live Claude investigations behind an access code or kept local.
-- Never expose unrestricted live mode with a personal API key.
+- Local-only: live Claude investigations for recording new replays and refreshing
+  evaluation artifacts.
+- Never expose live mode publicly with a personal API key.
 
 ## 9. Evaluation And Hardening Flow
 

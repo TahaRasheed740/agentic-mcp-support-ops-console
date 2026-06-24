@@ -43,6 +43,9 @@ For a visual walkthrough of the entities, containers, MCP services, investigatio
 flow, approvals, and evaluation gates, start with
 [the project flowcharts](docs/project-flowcharts.md).
 
+For public hosting, TraceDesk is intended to run as a replay-only demo. See
+[the replay-only deployment guide](docs/deployment.md).
+
 ## Prerequisites
 
 - Docker Desktop with the Docker engine running.
@@ -96,10 +99,10 @@ npm run test:e2e --workspace apps/web
 
 Copy `.env.example` to `.env`. Development credentials are intentionally local
 and must not be used in a hosted environment. Live investigations require
-`ANTHROPIC_API_KEY` in the uncommitted `.env` file. Hosted production deployments
-also require `LIVE_INVESTIGATION_ACCESS_CODE`; without it, the API refuses live
-Claude investigations even if an Anthropic key is present. Recorded replays stay
-public because they do not call Claude or spend tokens. The first knowledge ingestion downloads the public BGE
+`LIVE_INVESTIGATIONS_ENABLED=true` and `ANTHROPIC_API_KEY` in the uncommitted
+`.env` file. Hosted production deployments should set
+`LIVE_INVESTIGATIONS_ENABLED=false` and should not configure `ANTHROPIC_API_KEY`.
+Recorded replays stay public because they do not call Claude or spend tokens. The first knowledge ingestion downloads the public BGE
 embedding model and stores it in a Docker volume for later starts.
 
 ## Deterministic Demo Data
@@ -144,6 +147,7 @@ and 100% required-source recall. See
 - `GET /api/v1/knowledge/search?q={query}&limit=8&mode=hybrid`
 - `GET /api/v1/mcp/servers`
 - `POST /api/v1/mcp/{service}/tools/{tool}`
+- `GET /api/v1/runtime`
 - `POST /api/v1/investigations`
 - `GET /api/v1/investigations/{investigation_id}`
 - `GET /api/v1/investigations/{investigation_id}/events`
@@ -167,10 +171,15 @@ See [the MCP architecture and tool contract](docs/mcp.md).
 
 ## Live Investigations
 
-Open a support case and select **Investigate with Claude**. The router classifies
-and plans, Claude-powered documentation, account, and reliability specialists run
-in bounded read-only lanes, the investigator calls only read tools, and the
-browser reconnects to the persisted event stream using SSE sequence IDs.
+For local development, enable live mode with `LIVE_INVESTIGATIONS_ENABLED=true`
+and set `ANTHROPIC_API_KEY`, then open a support case and select
+**Investigate with Claude**. The router classifies and plans, Claude-powered
+documentation, account, and reliability specialists run in bounded read-only
+lanes, the investigator calls only read tools, and the browser reconnects to the
+persisted event stream using SSE sequence IDs.
+
+Public deployments should leave live mode disabled and use recorded replays
+instead.
 
 The hard limits are four investigator model rounds, two specialist rounds per lane,
 thirty tool calls, fixed per-response output

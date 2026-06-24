@@ -240,6 +240,13 @@ export type EvaluationReport = {
   cost_latency_note: string;
 };
 
+export type RuntimeCapabilities = {
+  app_env: string;
+  live_investigations_enabled: boolean;
+  live_investigations_reason: string;
+  public_replay_only: boolean;
+};
+
 const internalApiUrl = process.env.API_INTERNAL_URL ?? "http://localhost:8001";
 
 export async function getCases(filters: {
@@ -307,6 +314,12 @@ export async function getEvaluationReport(): Promise<EvaluationReport> {
   const response = await fetch(`${internalApiUrl}/api/v1/evaluations/latest`, { cache: "no-store" });
   if (!response.ok) throw new Error("Unable to load evaluation report");
   return (await response.json()) as EvaluationReport;
+}
+
+export async function getRuntimeCapabilities(): Promise<RuntimeCapabilities> {
+  const response = await fetch(`${internalApiUrl}/api/v1/runtime`, { cache: "no-store" });
+  if (!response.ok) throw new Error("Unable to load runtime capabilities");
+  return (await response.json()) as RuntimeCapabilities;
 }
 
 export function formatDate(value: string): string {

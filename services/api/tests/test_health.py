@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from tracedesk_api.config import get_settings
 from tracedesk_api.main import app
 
 
@@ -51,3 +52,19 @@ async def test_readiness_reports_database_failure() -> None:
 
     assert response.status_code == 503
     assert response.json()["database"] == "unavailable"
+
+
+@pytest.mark.asyncio
+async def test_runtime_reports_replay_only_when_live_is_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LIVE_INVESTIGATIONS_ENABLED", "false")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")
+    get_settings.cache_clear()
+    try:
+        async with client_with_engine(object()) as client:
+            response = await client.get("/api/v1/runtime")
+    finally:
+        get_settings.cache_clear()
+
+    assert response.status_code == 200
+    assert response.json()["live_investigations_enabled"] is False
+    assert response.json()["public_replay_only"] is True

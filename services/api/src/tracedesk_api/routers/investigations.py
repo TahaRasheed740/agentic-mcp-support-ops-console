@@ -31,13 +31,12 @@ router = APIRouter(prefix="/api/v1/investigations", tags=["investigations"])
 async def create_investigation(
     body: InvestigationCreate,
     request: Request,
-    live_access_code: str | None = Header(default=None, alias="X-TraceDesk-Live-Code"),
     tracedesk_session: str | None = Cookie(default=None),
     engine: AsyncEngine = Depends(get_engine),
 ) -> InvestigationCreated:
     settings = get_settings()
     try:
-        verify_live_investigation_access(settings, live_access_code)
+        verify_live_investigation_access(settings)
     except LiveAccessDenied as error:
         status_code = (
             status.HTTP_503_SERVICE_UNAVAILABLE

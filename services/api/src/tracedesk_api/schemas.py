@@ -15,6 +15,13 @@ class ReadyHealth(BaseModel):
     database: Literal["connected", "unavailable"]
 
 
+class RuntimeCapabilities(BaseModel):
+    app_env: str
+    live_investigations_enabled: bool
+    live_investigations_reason: str
+    public_replay_only: bool
+
+
 class Persona(BaseModel):
     id: str
     name: str

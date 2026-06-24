@@ -51,10 +51,10 @@ query parameter allow reconnection without making memory the source of truth.
 embedding model IDs in workflow code. Local defaults use `claude-haiku-4-5` and
 `claude-sonnet-4-5`. `ANTHROPIC_API_KEY` belongs only in `.env` or a secret store.
 
-Hosted deployments should also set `LIVE_INVESTIGATION_ACCESS_CODE`. In
-production, TraceDesk blocks live investigations when this code is absent or when
-the launch request does not include the matching `X-TraceDesk-Live-Code` header.
-Recorded replays do not need the code because they do not call Claude or spend
+`LIVE_INVESTIGATIONS_ENABLED` is false by default. Local development can set it
+to true alongside `ANTHROPIC_API_KEY` to run live Claude investigations. Public
+deployments should leave it false and should not configure `ANTHROPIC_API_KEY`.
+Recorded replays do not need live mode because they do not call Claude or spend
 tokens.
 
 ## Current boundaries

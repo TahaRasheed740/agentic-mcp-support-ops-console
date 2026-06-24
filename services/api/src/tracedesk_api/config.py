@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     support_mcp_url: str = "http://localhost:8103/mcp"
     mcp_timeout_seconds: float = 8.0
     anthropic_api_key: str | None = None
-    live_investigation_access_code: str | None = None
+    live_investigations_enabled: bool = False
     claude_router_model: str = "claude-haiku-4-5"
     claude_investigator_model: str = "claude-sonnet-4-5"
     claude_request_timeout_seconds: float = 90.0
