@@ -39,6 +39,10 @@ The current product increment includes:
 - Docker Compose orchestration and health checks.
 - Python and TypeScript linting, type checking, tests, and CI.
 
+For a visual walkthrough of the entities, containers, MCP services, investigation
+flow, approvals, and evaluation gates, start with
+[the project flowcharts](docs/project-flowcharts.md).
+
 ## Prerequisites
 
 - Docker Desktop with the Docker engine running.
