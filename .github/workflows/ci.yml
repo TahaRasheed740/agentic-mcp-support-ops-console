@@ -31,16 +31,31 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e --workspace apps/web
 
   containers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: docker compose config --quiet
       - run: docker compose build
       - run: docker compose up -d --wait
+      - name: Wait for web app
+        run: |
+          for attempt in {1..30}; do
+            if curl -fsS http://localhost:3000/replays >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs web
+          exit 1
+      - run: npm run test:e2e --workspace apps/web
       - run: docker compose exec -T api python -m tracedesk_api.mcp_layer.contract_eval
       - if: always()
         run: docker compose down -v
