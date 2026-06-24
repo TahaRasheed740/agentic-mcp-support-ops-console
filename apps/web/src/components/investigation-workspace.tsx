@@ -93,7 +93,7 @@ export function InvestigationWorkspace({
         </div>
         {mode === "replay" && (
           <div className="replay-banner" role="note">
-            This is a frozen anonymous replay. It does not call Claude, stream SSE, or mutate support state.
+            Recorded from a real local Claude investigation. Playback is read-only and does not spend API credits or change support data.
           </div>
         )}
         {mode === "replay" && (

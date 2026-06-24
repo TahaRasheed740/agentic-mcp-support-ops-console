@@ -40,9 +40,9 @@ export function AppShell({
           </Link>
         </nav>
         <div className="iteration-card">
-          <span>Iteration 7</span>
-          <strong>Evaluation hardening</strong>
-          <p>Reports track evidence recall, citation validity, diagnosis quality, and write safety.</p>
+          <span>Portfolio demo</span>
+          <strong>Replay-safe public mode</strong>
+          <p>Visitors can explore captured Claude investigations without spending API credits or changing support data.</p>
         </div>
       </aside>
       <div className="workspace">

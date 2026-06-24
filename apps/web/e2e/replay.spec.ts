@@ -7,7 +7,7 @@ test("captured replay is visible and clearly non-live", async ({ page }) => {
   await page.getByRole("link", { name: /EU Webhook Latency/i }).click();
 
   await expect(page.locator(".investigation-hero .panel-label")).toHaveText("Recorded replay");
-  await expect(page.getByText("does not call Claude")).toBeVisible();
+  await expect(page.getByText("Recorded from a real local Claude investigation")).toBeVisible();
   await expect(page.getByText("Event 0 of")).toBeVisible();
   await expect(page.getByText("Press Play or Step forward")).toBeVisible();
   await page.getByRole("button", { name: "Skip to end" }).click();
