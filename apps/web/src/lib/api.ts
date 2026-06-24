@@ -227,6 +227,16 @@ export type EvaluationReport = {
   failures: Array<{ metric: string; actual: number; threshold: number }>;
   failed_cases: Array<{ ticket_id: string }>;
   adversarial_cases: Array<{ id: string; prompt_injection_blocked: boolean }>;
+  model_grading: {
+    enabled: boolean;
+    reason?: string;
+    model?: string;
+    cases_graded?: number;
+    total_cases?: number;
+    pass_rate?: number;
+    input_tokens?: number;
+    output_tokens?: number;
+  };
   cost_latency_note: string;
 };
 

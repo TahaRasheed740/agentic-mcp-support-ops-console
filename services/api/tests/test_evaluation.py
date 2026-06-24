@@ -21,6 +21,7 @@ def test_deterministic_evaluation_passes_thresholds(tmp_path: Path) -> None:
     assert report["metrics"]["unauthorized_write_prevention"] == 1.0
     assert report["failures"] == []
     assert report["regression"]["baseline_found"] is False
+    assert report["model_grading"]["enabled"] is False
     assert len(report["citation_robustness_checks"]) == 16
     assert len(report["cases"]) == 15
     assert len(report["adversarial_cases"]) == 3
@@ -41,5 +42,7 @@ def test_evaluation_report_includes_failures_section_even_when_empty(tmp_path: P
     assert "## Tool Choice" in markdown
     assert "## Citation Robustness" in markdown
     assert "## Adversarial Checks" in markdown
+    assert "## Model-Based Grading" in markdown
+    assert "Pass --model-judge" in markdown
     assert "## Regression" in markdown
     assert "## Live Run Summary" in markdown

@@ -65,6 +65,22 @@ export default async function EvaluationsPage() {
           <div className="panel-heading"><div><span>Scope note</span><h2>What This Measures</h2></div></div>
           <p>{report.cost_latency_note}</p>
         </section>
+
+        <section className="panel evaluation-note">
+          <div className="panel-heading"><div><span>Optional judge</span><h2>Model-Based Grading</h2></div></div>
+          {report.model_grading.enabled ? (
+            <p>
+              Claude judged {report.model_grading.cases_graded} of {report.model_grading.total_cases} benchmark cases
+              with {report.model_grading.model}. Pass rate:{" "}
+              {Math.round((report.model_grading.pass_rate ?? 0) * 100)}%. Tokens:{" "}
+              {report.model_grading.input_tokens ?? 0} input, {report.model_grading.output_tokens ?? 0} output.
+            </p>
+          ) : (
+            <p>
+              {report.model_grading.reason} This is kept manual so CI and public demos do not spend Anthropic tokens.
+            </p>
+          )}
+        </section>
       </main>
     </AppShell>
   );

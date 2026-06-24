@@ -20,6 +20,7 @@ from tracedesk_api.investigations.schemas import (
     InvestigationView,
     ProposedAction,
 )
+from tracedesk_api.live_access import LiveAccessDenied, verify_live_investigation_access
 from tracedesk_api.mcp_layer.api_auth import authorization_for_request
 from tracedesk_api.mcp_layer.gateway import MCPGateway
 
@@ -30,15 +31,23 @@ router = APIRouter(prefix="/api/v1/investigations", tags=["investigations"])
 async def create_investigation(
     body: InvestigationCreate,
     request: Request,
+    live_access_code: str | None = Header(default=None, alias="X-TraceDesk-Live-Code"),
     tracedesk_session: str | None = Cookie(default=None),
     engine: AsyncEngine = Depends(get_engine),
 ) -> InvestigationCreated:
     settings = get_settings()
-    if not settings.anthropic_api_key:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Live investigations require ANTHROPIC_API_KEY",
+    try:
+        verify_live_investigation_access(settings, live_access_code)
+    except LiveAccessDenied as error:
+        status_code = (
+            status.HTTP_503_SERVICE_UNAVAILABLE
+            if not settings.anthropic_api_key
+            else status.HTTP_403_FORBIDDEN
         )
+        raise HTTPException(
+            status_code=status_code,
+            detail=str(error),
+        ) from error
     authorization = await authorization_for_request(tracedesk_session, engine)
     manager: InvestigationManager = request.app.state.investigation_manager
     try:

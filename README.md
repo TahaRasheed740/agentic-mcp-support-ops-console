@@ -96,7 +96,10 @@ npm run test:e2e --workspace apps/web
 
 Copy `.env.example` to `.env`. Development credentials are intentionally local
 and must not be used in a hosted environment. Live investigations require
-`ANTHROPIC_API_KEY` in the uncommitted `.env` file. The first knowledge ingestion downloads the public BGE
+`ANTHROPIC_API_KEY` in the uncommitted `.env` file. Hosted production deployments
+also require `LIVE_INVESTIGATION_ACCESS_CODE`; without it, the API refuses live
+Claude investigations even if an Anthropic key is present. Recorded replays stay
+public because they do not call Claude or spend tokens. The first knowledge ingestion downloads the public BGE
 embedding model and stores it in a Docker volume for later starts.
 
 ## Deterministic Demo Data
@@ -185,6 +188,13 @@ Run the deterministic evaluation suite with:
 
 ```powershell
 uv run --project services/api python -m tracedesk_api.evaluation
+```
+
+Run optional Claude-as-judge grading manually when you want model-based review.
+This spends Anthropic API tokens and is intentionally excluded from CI:
+
+```powershell
+uv run --project services/api python -m tracedesk_api.evaluation --model-judge --judge-limit 5
 ```
 
 Reports are written to `reports/evaluations/latest.json` and
