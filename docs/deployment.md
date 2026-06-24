@@ -68,7 +68,9 @@ After deployment, verify:
 
 - `/` loads the support queue.
 - `/replays` loads recorded replays.
+- Four replay scenarios are listed.
 - A replay clearly states that it does not call Claude.
+- Replay controls can step through the recorded investigation events.
 - `/knowledge` returns evidence results.
 - `/tools` opens the MCP tool explorer.
 - `/evaluations` shows the latest deterministic and model-judge report.

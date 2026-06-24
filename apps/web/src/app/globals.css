@@ -223,6 +223,15 @@ a.case-row:hover { background: #faf8f2; }
 .connection-dot.live { background: #47a274; box-shadow: 0 0 0 4px #e2f0e8; }
 .connection-dot.connecting { background: var(--orange); }
 .replay-banner { padding: 12px 15px; color: #345340; background: var(--green-soft); border: 1px solid #cfe1d6; border-radius: 8px; font-size: 0.78rem; line-height: 1.5; }
+.replay-controls { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.replay-controls > div:first-child { min-width: 230px; display: grid; gap: 6px; }
+.replay-controls strong { font-family: Georgia, serif; font-size: 1.1rem; font-weight: 400; }
+.replay-controls progress { width: 100%; height: 9px; accent-color: var(--green); }
+.replay-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.replay-buttons button, .replay-buttons select { padding: 8px 10px; color: var(--green); background: var(--green-soft); border: 1px solid #cfe1d6; border-radius: 7px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+.replay-buttons button.primary { color: white; background: var(--ink); border-color: var(--ink); }
+.replay-buttons button:disabled { opacity: 0.55; cursor: not-allowed; }
+.replay-buttons label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.7rem; font-weight: 700; }
 .investigation-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .investigation-metrics > div { padding: 15px 17px; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; }
 .investigation-metrics span, .investigation-metrics strong { display: block; }
@@ -333,6 +342,9 @@ a.case-row:hover { background: #faf8f2; }
   .case-sidebar { grid-template-columns: 1fr; }
   .investigation-side { grid-template-columns: 1fr; }
   .investigation-hero { flex-direction: column; }
+  .replay-controls { align-items: stretch; flex-direction: column; }
+  .replay-buttons { justify-content: stretch; }
+  .replay-buttons button, .replay-buttons label { flex: 1 1 auto; }
   .investigation-metrics { grid-template-columns: repeat(2, 1fr); }
   .action-card { grid-template-columns: 1fr; }
   .action-controls { align-items: stretch; }

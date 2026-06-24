@@ -189,9 +189,9 @@ limits, and 65,000 cumulative input, output, and cache tokens. See
 ## Replays And Evaluation
 
 Open [recorded replays](http://localhost:3000/replays) for an anonymous public
-demo that does not call Claude or mutate support state. The canonical replay
-demonstrates specialist reports, evidence citations, a drafted response, and a
-pending approval action.
+demo that does not call Claude or mutate support state. The replay page includes
+four canonical scenarios with playback controls, progressive event reveal,
+specialist reports, evidence citations, drafted responses, and approval queues.
 
 Run the deterministic evaluation suite with:
 

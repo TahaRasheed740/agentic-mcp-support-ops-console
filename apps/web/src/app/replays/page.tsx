@@ -15,7 +15,7 @@ export default function ReplaysPage() {
               clearly separate demonstration playback from live execution.
             </p>
           </div>
-          <span className="queue-total">{replayScenarios.length} replay scenario</span>
+          <span className="queue-total">{replayScenarios.length} replay scenarios</span>
         </section>
 
         <section className="replay-list">
