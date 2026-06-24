@@ -123,7 +123,7 @@ flowchart TD
     B --> C["Review case details<br/>customer, integration, recent runs, incidents"]
     C --> D{"Need AI investigation?"}
     D -- No --> E["Use manual context and knowledge search"]
-    D -- Yes --> F["Click Investigate with Claude"]
+    D -- Yes --> F["Enter live access code if required<br/>then click Investigate with Claude"]
     F --> G["Live investigation workspace opens"]
     G --> H["Watch streamed agent timeline"]
     H --> I["Review evidence and citations"]
@@ -149,7 +149,11 @@ sequenceDiagram
     participant MCP as MCP Services
     participant DB as PostgreSQL
 
-    UI->>API: Start investigation for ticket
+    UI->>API: Start investigation for ticket with optional live access code
+    API->>API: Check ANTHROPIC_API_KEY and production access-code gate
+    alt Live access denied
+        API-->>UI: Return protected-live-mode error
+    else Live access allowed
     API->>MCP: support.get_case
     MCP->>DB: Read ticket and session overlay
     DB-->>MCP: Case context
@@ -187,6 +191,7 @@ sequenceDiagram
     Inv-->>API: Diagnosis, citations, proposed actions
     API->>DB: Validate citations and save result
     API-->>UI: Stream completed investigation
+    end
 ```
 
 ## 6. Retrieval And Evidence Flow
@@ -251,7 +256,7 @@ flowchart LR
     Visitor["Visitor / recruiter"] --> Replay["Recorded replay mode"]
     Replay --> Frozen["Frozen investigation data<br/>no Claude call, no writes, no cost"]
 
-    Reviewer["Trusted reviewer"] --> LiveGate{"Live access allowed?"}
+    Reviewer["Trusted reviewer"] --> LiveGate{"Valid live access code<br/>and API key available?"}
     LiveGate -- No --> Replay
     LiveGate -- Yes --> Live["Live Claude investigation"]
     Live --> Cost["Uses Anthropic API key<br/>token cost and rate limits apply"]
@@ -265,8 +270,8 @@ Recommended deployment stance:
 
 ## 9. Evaluation And Hardening Flow
 
-Evaluation is split into deterministic CI-safe grading and optional live/model
-review.
+Evaluation is split into deterministic CI-safe grading and optional token-spending
+model review.
 
 ```mermaid
 flowchart TD
@@ -274,6 +279,7 @@ flowchart TD
     Adversarial["Adversarial tickets<br/>prompt injection, fake citations, secret requests"] --> Eval
     Eval --> Metrics["Metrics"]
     Metrics --> Report["reports/evaluations/latest.md"]
+    Eval --> SafeDefault["CI default<br/>no Claude call, no token spend"]
 
     Metrics --> A["classification accuracy"]
     Metrics --> B["required evidence recall"]
@@ -284,6 +290,7 @@ flowchart TD
     Metrics --> G["prompt-injection defense"]
 
     LiveRuns["Live investigation report"] --> Report
+    ModelJudge["Optional Claude-as-judge<br/>manual --model-judge run"] --> Report
     Previous["Previous latest.json"] --> Regression["Regression comparison"]
     Regression --> Report
 ```
@@ -299,6 +306,13 @@ Current deterministic gates:
 | Tool-choice accuracy | 90%+ |
 | Citation robustness | 100% |
 | Unauthorized write prevention | 100% |
+
+Optional model-based grading:
+
+- Runs only when `--model-judge` is passed.
+- Uses Claude to review benchmark outputs for helpfulness, grounding, citation
+  quality, and action safety.
+- Is intentionally manual so CI and public demos do not spend Anthropic tokens.
 
 ## 10. End-To-End Mental Model
 

@@ -51,11 +51,19 @@ query parameter allow reconnection without making memory the source of truth.
 embedding model IDs in workflow code. Local defaults use `claude-haiku-4-5` and
 `claude-sonnet-4-5`. `ANTHROPIC_API_KEY` belongs only in `.env` or a secret store.
 
+Hosted deployments should also set `LIVE_INVESTIGATION_ACCESS_CODE`. In
+production, TraceDesk blocks live investigations when this code is absent or when
+the launch request does not include the matching `X-TraceDesk-Live-Code` header.
+Recorded replays do not need the code because they do not call Claude or spend
+tokens.
+
 ## Current boundaries
 
 - A process restart cancels an active in-process task, although persisted events
   remain durable.
-- The deterministic evaluation command does not call Claude. It grades benchmark
-  behavior with fixed rules so CI remains inexpensive and reproducible.
+- The default evaluation command does not call Claude. It grades benchmark
+  behavior with fixed rules so CI remains inexpensive and reproducible. Optional
+  model-based grading is available through `--model-judge` and should be run
+  manually because it spends Anthropic tokens.
 - Drafted responses and actions are recommendations until a human approves the
   queued write action.
